@@ -1,5 +1,5 @@
+import asyncio
 import speech_recognition as sr
-import os
 import pyttsx3
 import platform
 from selenium import webdriver
@@ -10,8 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
-import time
 import streamlit as st
+from gtts import gTTS
+import os
 
 # Initialize global text variable
 text = None
@@ -23,15 +24,14 @@ recognizer = sr.Recognizer()
 async def listen_and_convert():
     global text
     with sr.Microphone() as source:
-        st.write("Mic on! Bolna shuru karo... (5 seconds sunega)")
-        # Adjust for ambient noise (2 seconds for rural noise)
-        recognizer.adjust_for_ambient_noise(source, duration=1)
+        st.write("Mic on! Bolna shuru karo... (10 seconds sunega)")
+        recognizer.adjust_for_ambient_noise(source, duration=2)  # Increased for rural noise
         try:
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=5)
+            audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
             st.write("Audio captured! Converting to text...")
             raw_text = recognizer.recognize_google(audio, language="hi-IN")
             text = transliterate(raw_text, sanscript.DEVANAGARI, sanscript.IAST) 
-            st.write(f"Text (Roman lipi): {text}")
+            st.write(f"Text: {text}")
             return text
         except sr.UnknownValueError:
             st.write("Audio nahi samjha!")
@@ -46,18 +46,26 @@ async def listen_and_convert():
             text = "Something went wrong"
             return text
 
-# Function to convert text to speech with pyttsx3
+# Function to convert text to speech with pyttsx3 (local) or gTTS (cloud)
 def text_to_speech(output_text: str):
-    try:
-        engine = pyttsx3.init()
-        # Adjust voice properties for clarity
-        engine.setProperty('rate', 150)  # Speed of speech
-        engine.setProperty('volume', 0.9)  # Volume (0.0 to 1.0)
-        engine.say(output_text)
-        engine.runAndWait()
-        st.write("Audio output played!")
-    except Exception as e:
-        st.write(f"pyttsx3 error: {e}")
+    if platform.system() != "Emscripten" and os.environ.get("STREAMLIT_CLOUD") is None:
+        try:
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 150)
+            engine.setProperty('volume', 0.9)
+            engine.say(output_text)
+            engine.runAndWait()
+            st.write("Audio output played!")
+        except Exception as e:
+            st.write(f"pyttsx3 error: {e}")
+    else:
+        try:
+            tts = gTTS(text=output_text, lang='hi')
+            tts.save("output.mp3")
+            st.audio("output.mp3")
+            st.write("Audio output available as MP3!")
+        except Exception as e:
+            st.write(f"gTTS error: {e}")
 
 # Async main function for Pyodide compatibility
 async def main():
@@ -78,14 +86,13 @@ if st.button("Start Mic"):
     # Selenium part (runs after async completes)
     if text and "Error" not in text and "Could not" not in text:
         userq = text
-        # Setup Selenium with headless mode
         options = Options()
         options.add_argument("--incognito")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--headless=new")  # Headless mode for efficiency
-        options.add_argument("--disable-gpu")  # Disable GPU for headless
-        options.add_argument("--no-sandbox")  # For Streamlit Cloud
-        options.add_argument("--disable-dev-shm-usage")  # For Streamlit Cloud
+        options.add_argument("--headless=new")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         driver = webdriver.Chrome(options=options)
@@ -99,27 +106,20 @@ if st.button("Start Mic"):
         
         try:
             driver.get("https://www.google.com")
-            # Wait for AI mode button
             aimode = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='plR5qb']"))
             )
             aimode.click()
-            
-            # Wait for query input
             query = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='ITIRGe']"))
             )
             query.send_keys(userq)
             query.send_keys(Keys.RETURN)
-            
-            # Wait for result (optimized timeout)
-            result = WebDriverWait(driver, 20).until(  # Reduced timeout for efficiency
+            result = WebDriverWait(driver, 20).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='pWvJNd']"))
             )
             gemini_output = result.text
             st.write(f"Gemini Output: {gemini_output}")
-            
-            # Convert Gemini output to audio
             text_to_speech(gemini_output)
         except Exception as e:
             st.write(f"Selenium error: {e}")
