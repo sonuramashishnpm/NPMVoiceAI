@@ -25,13 +25,13 @@ async def listen_and_convert():
     global text
     with sr.Microphone() as source:
         st.write("Mic on! Bolna shuru karo... (10 seconds sunega)")
-        recognizer.adjust_for_ambient_noise(source, duration=2)  # Increased for rural noise
+        recognizer.adjust_for_ambient_noise(source, duration=2)
         try:
             audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
             st.write("Audio captured! Converting to text...")
             raw_text = recognizer.recognize_google(audio, language="hi-IN")
-            text = transliterate(raw_text, sanscript.DEVANAGARI, sanscript.IAST) 
-            st.write(f"Text: {text}")
+            text = transliterate(raw_text, sanscript.DEVANAGARI, sanscript.IAST) + " (provide response in roman lipi, not devanagari)"
+            st.write(f"Text (Roman lipi with prompt): {text}")
             return text
         except sr.UnknownValueError:
             st.write("Audio nahi samjha!")
