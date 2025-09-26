@@ -1,3 +1,3 @@
-libportaudio2  # PyAudio ke liye (mic input)
-chromium-browser  # Headless Chrome
-chromium-chromedriver  # Selenium ke liye ChromeDriver
+libportaudio2
+chromium
+chromium-driver
