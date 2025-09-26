@@ -1,6 +1,7 @@
-streamlit==1.38.0  # For running the Streamlit app (UI and backend)
-speechrecognition==3.10.4  # For mic input and voice to text conversion
-pyttsx3==2.90  # For text to speech output (offline audio)
-selenium==4.24.0  # For automating Chrome to scrape Gemini AI
-webdriver-manager==4.0.2  # For automatically managing ChromeDriver versions
-indic-transliteration==2.3.59  # For converting Hindi/Urdu to Roman lipi
+streamlit==1.38.0
+speechrecognition==3.10.4
+pyaudio==0.2.14  # Explicitly add for mic support
+pyttsx3==2.90
+selenium==4.24.0
+webdriver-manager==4.0.2
+indic-transliteration==2.3.59
