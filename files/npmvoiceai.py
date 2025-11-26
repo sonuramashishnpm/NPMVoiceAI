@@ -2,12 +2,7 @@ import asyncio
 import speech_recognition as sr
 import pyttsx3
 import platform
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from npmai import Gemini
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 import streamlit as st
@@ -85,47 +80,10 @@ if st.button("Start Mic"):
 
     # Selenium part (runs after async completes)
     if text and "Error" not in text and "Could not" not in text:
-        userq = text
-        options = Options()
-        options.add_argument("--incognito")
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--headless=new")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
-        driver = webdriver.Chrome(options=options)
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
-                Object.defineProperty(navigator, 'webdriver', {
-                  get: () => undefined
-                })
-            """
-        })
-        
-        try:
-            driver.get("https://www.google.com")
-            aimode = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "[class*='plR5qb']"))
-            )
-            aimode.click()
-            query = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='ITIRGe']"))
-            )
-            query.send_keys(userq)
-            query.send_keys(Keys.RETURN)
-            result = WebDriverWait(driver, 20).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='pWvJNd']"))
-            )
-            gemini_output = result.text
-            st.write(f"Gemini Output: {gemini_output}")
-            text_to_speech(gemini_output)
-        except Exception as e:
-            st.write(f"Selenium error: {e}")
-            text_to_speech("Error fetching Gemini result")
-        finally:
-            driver.quit()
+        prompts=text
+        llm=Gemini()
+        print(llm.invoke(prompts))
+
     else:
         st.write(f"No valid query to process: {text}")
         text_to_speech(f"No valid query to process: {text}")
