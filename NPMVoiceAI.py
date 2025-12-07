@@ -2,12 +2,13 @@ import asyncio
 import speech_recognition as sr
 import pyttsx3
 import platform
-from npmai import Gemini
+from npmai import Gemini,GeminiAIMode,Grok,Perplexity,Mistral,ChatGPT
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 from gtts import gTTS
 import os
 
+llms=input("Enter A.I from which you want to use  so select and write exact from here:-{'ChatGPT','Grok','Perplexity','Gemini','GeminiAIMode','Mistral'}:")
 text = None
 
 recognizer = sr.Recognizer()
@@ -71,7 +72,7 @@ else:
 
 if text and "Error" not in text and "Could not" not in text:
     prompts=text
-    llm=Gemini()
+    llm=globals()[llms]()
     print(llm.invoke(prompts))
 
 else:
