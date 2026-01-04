@@ -5,8 +5,10 @@ import os
 app = Flask(__name__, template_folder="templates", static_folder="static")
 
 # Initialize LLM
-llm = Ollama()
-MODEL_NAME = "llama3.2"  # Fixed model
+llm = Ollama(
+    model="llama3.2",
+    temperature=0.8
+)
 
 @app.route("/")
 def index():
@@ -22,7 +24,7 @@ def NPMai_ask():
         return jsonify({"response": "❗ Please provide a question."})
 
     try:
-        result = llm.invoke(prompt, MODEL_NAME)
+        result = llm.invoke(prompt)
         response = str(result)
     except Exception as e:
         response = f"❌ Error: {str(e)}"
