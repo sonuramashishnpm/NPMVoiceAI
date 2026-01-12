@@ -5,3 +5,4 @@ fastapi
 opencv-python-headless
 pytesseract
 numpy
+uvicorn
