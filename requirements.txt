@@ -1,3 +1,7 @@
 Flask
 npmai
 gunicorn
+fastapi
+opencv-python-headless
+pytesseract
+numpy
