@@ -38,7 +38,7 @@ def NPMai_ask():
 
 app=FastAPI()
 
-app.mount("/flask", WSGIMiddleware(flask_app))
+app.mount("/", WSGIMiddleware(flask_app))
 
 #OCR Handling
 @app.post("/ocr")
