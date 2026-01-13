@@ -41,7 +41,7 @@ app=FastAPI()
 app.mount("/flask",WSGIMiddleware(flask_app))
 
 #OCR Handling
-@ocr_app.post("/ocr")
+@app.post("/ocr")
 async def create_upload_file(file: UploadFile):
     path = await file.read()
     nparr=np.frombuffer(path,np.uint8)
