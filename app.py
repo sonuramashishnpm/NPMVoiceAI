@@ -36,10 +36,12 @@ def NPMai_ask():
 
     return jsonify({"response": response})
 
-ocr_app=FastAPI()
+app=FastAPI()
+
+app.mount("/flask",WSGIMiddleware(flask_app))
 
 #OCR Handling
-@ocr_app.post("/")
+@ocr_app.post("/ocr")
 async def create_upload_file(file: UploadFile):
     path = await file.read()
     nparr=np.frombuffer(path,np.uint8)
@@ -48,9 +50,6 @@ async def create_upload_file(file: UploadFile):
     text = pytesseract.image_to_string(gray)
     return text
 
-app=FastAPI()
 
-app.mount("/", WSGIMiddleware(flask_app))
-app.mount("/ocr", ocr_app)
 
 
