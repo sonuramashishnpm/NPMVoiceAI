@@ -61,7 +61,7 @@ async function askAI() {
     responseBox.textContent = "🧠 Thinking...";
 
     try {
-        const res = await fetch("/askAI", {
+        const res = await fetch("/flask/askAI", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prompt: input })
