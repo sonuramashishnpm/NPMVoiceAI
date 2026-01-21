@@ -61,7 +61,7 @@ async function askAI() {
     responseBox.textContent = "🧠 Thinking...";
 
     try {
-        const res = await fetch("/NPMai-ask", {
+        const res = await fetch("/askAI", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prompt: input })
