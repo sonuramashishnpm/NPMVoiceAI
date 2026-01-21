@@ -20,7 +20,7 @@ def index():
     return render_template("index.html")
 
 # Endpoint to handle AI chat
-@flask_app.route("/NPMai-ask", methods=["POST"])
+@flask_app.route("/askAI", methods=["POST"])
 def NPMai_ask():
     data = request.get_json()
     prompt = data.get("prompt", "")
