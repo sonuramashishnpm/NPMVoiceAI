@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Initialize LLM
 llm = Ollama(
     model="llama3.2",
-    temperature=0.8
+    temperature=0.3
 )
 
 @app.route("/")
