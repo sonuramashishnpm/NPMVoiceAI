@@ -1,21 +1,50 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from npmai import Ollama
+import json
+import os
+import uuid
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "generate_a_real_one_later")
 
 # Initialize LLM
 llm = Ollama(
-    model="llama3.2",
+    model="llama3.2", 
     temperature=0.3
 )
 
+class Memory:
+    def __init__(self, user_id):
+        self.filename = f"memory_{user_id}.json"
+
+    def save_context(self, user_input, ai_output):
+        with open(self.filename, "a") as data:
+            json.dump({"Human": user_input, "AI": ai_output}, data)
+            data.write("\n")
+
+    def load_memory_variables(self):
+        string_history = ""
+        if os.path.exists(self.filename) and os.path.getsize(self.filename) > 0:
+            with open(self.filename, "r") as data:
+                for line in data:
+                    try:
+                        ldata = json.loads(line)
+                        string_history += f"Human: {ldata['Human']}\nAI: {ldata['AI']}\n"
+                    except json.JSONDecodeError:
+                        continue
+        return string_history
+
 @app.route("/")
 def index():
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
     return render_template("index.html")
 
-# Endpoint to handle AI chat
 @app.route("/askAI", methods=["POST"])
 def NPMai_ask():
+    user_id = session.get('user_id', str(uuid.uuid4()))
+    memory = Memory(user_id)
+    
     data = request.get_json()
     prompt = data.get("prompt", "")
 
@@ -23,15 +52,17 @@ def NPMai_ask():
         return jsonify({"response": "❗ Please provide a question."})
 
     try:
-        result = llm.invoke(prompt)
+        history = memory.load_memory_variables()
+        full_prompt = f"Context history:\n{history}\nHuman: {prompt}\nAI:"
+        
+        result = llm.invoke(full_prompt)
         response = str(result)
+        
+        memory.save_context(prompt, response)
+        
+        return jsonify({"response": response})
     except Exception as e:
-        response = f"❌ Error: {str(e)}"
-
-    return jsonify({"response": response})
+        return jsonify({"response": f"❌ Error: {str(e)}"})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
-
-
+    app.run(host="0.0.0.0", port=5000)
