@@ -13,10 +13,11 @@
   </video>
   <div id="video-overlay"></div>
 
-  <h2>NPM A.I ask anything</h2>
+  <h2>NPM A.I Chat</h2>
 
-  <p>AI:</p>
-  <p id="response"></p>
+
+  <div id="chat-box" style="height: 400px; overflow-y: auto; padding: 10px; border: 1px solid #ccc; background: rgba(0,0,0,0.5); color: white; white-space: pre-wrap;">
+  </div>
 
   <div class="stickdiv">
     <input type="text" id="userInput" placeholder="Type your question here..." />
@@ -25,59 +26,40 @@
   </div> 
 
 <script>
-function startListening() {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-IN"; // "hi-IN" for Hindi
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-        document.getElementById("userInput").placeholder = "🎙️ Listening...";
-    };
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById("userInput").value = transcript;
-        document.getElementById("userInput").placeholder = "Type your question here...";
-        askAI(); // auto-send after speech
-    };
-
-    recognition.onerror = (event) => {
-        alert("🎤 Voice error: " + event.error);
-        document.getElementById("userInput").placeholder = "Type your question here...";
-    };
-
-    recognition.start();
+function appendMessage(role, text) {
+    const chatBox = document.getElementById("chat-box");
+    const msgDiv = document.createElement("div");
+    msgDiv.style.marginBottom = "15px";
+    msgDiv.innerHTML = `<strong>${role}:</strong> ${text}`;
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight; 
 }
 
 async function askAI() {
-    const input = document.getElementById("userInput").value.trim();
-    const responseBox = document.getElementById("response");
+    const inputField = document.getElementById("userInput");
+    const prompt = inputField.value.trim();
 
-    if (!input) {
-        responseBox.textContent = "❗ Please type something!";
-        return;
-    }
-
-    responseBox.textContent = "🧠 Thinking...";
+    if (!prompt) return;
+  
+    appendMessage("You", prompt);
+    inputField.value = ""; 
 
     try {
-        const res = await fetch("/flask/askAI", {
+        const res = await fetch("/askAI", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: input })
+            body: JSON.stringify({ prompt: prompt })
         });
 
         const data = await res.json();
-        responseBox.textContent = data.response;
-        speak(data.response);
+        
+        appendMessage("AI", data.response);
 
     } catch (err) {
-        responseBox.textContent = "❌ Failed to get AI response.";
-        console.error(err);
+        appendMessage("System", "❌ Failed to get response.");
     }
 }
-
-function speak(text) {
+function listen(text) {
     const msg = new SpeechSynthesisUtterance(text);
     msg.lang = "en-IN";
     msg.rate = 0.95;
