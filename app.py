@@ -5,7 +5,7 @@ import os
 import uuid
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "generate_a_real_one_later")
+app.secret_key = os.environ.get("SECRET_KEY", "48a35791177f22fba22b2cd08ad4436c1c4a1587b289ae9a75419280b934b7de")
 
 # Initialize LLM
 llm = Ollama(
