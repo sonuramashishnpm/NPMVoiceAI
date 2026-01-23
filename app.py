@@ -1,11 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from fastapi.middleware.wsgi import WSGIMiddleware
-from typing import Annotated, Optional, Dict, Any
-from fastapi import FastAPI, File, UploadFile
 from npmai import Ollama
-import pytesseract, cv2
-import numpy as np
-import os
 
 app = Flask(__name__)
 
