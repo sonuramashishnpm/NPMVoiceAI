@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session
-from npmai import Ollama
+from npmai import Ollama,Memory
 import json
 import os
 import uuid
