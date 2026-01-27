@@ -1,6 +1,7 @@
 body {
-  margin: 0;
-  padding: 0;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  /* padding: 0; */
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #1a1a2e, #0f172a);
   color: #e0e0e0;
@@ -27,7 +28,7 @@ body {
 
 h2 {
   font-size: 2.5em;
-  margin: 80px 0 20px;
+  /* margin: 80px 0 20px; */
   color: #60a5fa;
   text-align: center;
   font-weight: 600;
@@ -49,7 +50,7 @@ input#userInput {
   display: block;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  margin-top:500px;
+  /* margin-top:500px; */
 }
 
 input#userInput:focus {
@@ -193,13 +194,12 @@ p,
 #response
 
  {
-  position: relative;
+  /* position: relative; */
   z-index: 10;
 }
 .stickdiv{
   position: sticky;
-  z-index: 20;
- 
+  /* z-index: 20; */
 }
 
 
@@ -218,13 +218,13 @@ p,
 
   h2 {
     font-size: 1.8em;
-    margin-top: 40px;
+    /* margin-top: 40px; */
   }
 
   input#userInput {
     width: 90%;
     max-width: 350px;
-    margin-top: 1000px;
+    /* margin-top: 1000px; */
     padding: 12px 15px;
     font-size: 14px;
   }
