@@ -9,8 +9,8 @@ app.secret_key = os.environ.get("SECRET_KEY", "48a35791177f22fba22b2cd08ad4436c1
 
 # Initialize LLM
 llm = Ollama(
-    model="qwen2.5-coder:7b", 
-    temperature=0.3
+    model="llama3.2", 
+    temperature=0.5
 )
 
 @app.route("/")
