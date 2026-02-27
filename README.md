@@ -1,3 +1,6 @@
+## To understand repo project with AI in detail with full documentation visit here:-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sonuramashishnpm/NPM-Journalist)
+
 Project Overview
 This is a Voice AI App built with Streamlit for rural users in India. It listens to voice input in Hindi/Urdu, converts it to Roman script text, queries Google AI (Gemini) for responses, and plays the output as audio. Designed for simple accessibility – click a button, speak, get Roman text and spoken reply. High-level goal: Help farmers/students with quick info (e.g., crop risks, weather), no typing needed.
 Key Features
